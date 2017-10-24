@@ -1,0 +1,12 @@
+Source: ch-home
+Section: admin
+Priority: optional
+Maintainer: Luis Antonio Garcia Gisbert <luisgg@gmail.com>
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 7.0.8)
+
+Package: ch-home
+Architecture: all
+Depends: sudo
+Description: Fix ownership of home files
+ Simple tool to change owner in home files and dirs

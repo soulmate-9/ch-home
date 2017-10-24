@@ -1,0 +1,59 @@
+#!/bin/sh
+# -------
+# File:        user-adopt
+# Description: Allow non-root users to change owner of any file or directory under
+#	       $HOME to self user and primary group
+# Author:      Luis Antonio Garcia Gisbert <luisgg@gmail.com> 
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along 
+# with this program; if not, write to the Free Software Foundation, Inc., 
+# 51 Franklin St, Fifth Floor, Boston MA 02110-1301 USA
+# --------
+
+
+die(){
+	echo "$1" >&2
+	exit 1
+}
+
+
+[ "$1"  ] || die "Usage: $(basename "$0") TARGET"
+TARGET="$(readlink -f "$1")"
+[ -e "$TARGET" ] || die "$TARGET not found"
+rc=0
+USER_ID=$(id -u)
+[ $(id -u) -eq 0 ] || die "root privileges required"
+if [ "$SUDO_USER" ] ; then
+	# non root user running under sudo
+	# allow umount only under home directory
+	HOME_DIR="$(getent passwd $SUDO_USER |cut -f 6 -d :)"
+	GROUP_ID="$(id -g "$SUDO_USER")"
+	[ "$HOME_DIR" -a "$GROUP_ID" ] || die "$SUDO_USER is not a valid user"
+	HOME_DIR="$(echo "${HOME_DIR}/" |tr -s "/")"
+	(find "$TARGET" -type d ;find "$TARGET" -type f)  |while read f; do
+		if echo "$f" |grep -q "^$HOME_DIR" ; then
+			if chown $SUDO_USER:$GROUP_ID "$f" ;then
+				echo "Owner changed: \"$f\""
+			else
+				echo "(UNABLE to change owner of \"$f\")" >&2
+			fi
+		else
+			echo "(SKIPPING \"$f\")" >&2
+		fi
+	done
+else
+	# not running under sudo
+	die "Unable to determine username. Are you running under sudo?"
+fi
+exit $rc
+
