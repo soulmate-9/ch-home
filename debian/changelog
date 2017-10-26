@@ -1,3 +1,9 @@
+ch-home (0.2) stretch; urgency=medium
+
+  * Fixed a typo in sudoers file (oops!)
+
+ -- Luis Antonio Garcia Gisbert <luisgg@gmail.com>  Thu, 26 Oct 2017 17:06:45 +0000
+
 ch-home (0.1) stretch; urgency=medium
 
   * Initial release.

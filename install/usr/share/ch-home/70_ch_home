@@ -1,1 +1,1 @@
-ALL ALL=NOPASSWD: install/usr/sbin/ch-home
+ALL ALL=NOPASSWD: /usr/sbin/ch-home
